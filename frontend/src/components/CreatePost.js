@@ -16,7 +16,10 @@ export default function CreatePost({ refresh }) {
   const [text, setText] = useState("");
   const [imagePreview, setImagePreview] = useState(null);
 
-  const user = JSON.parse(localStorage.getItem("user"));
+  const user =
+  typeof window !== "undefined"
+    ? JSON.parse(localStorage.getItem("user"))
+    : null;
 
   const handleImage = (e) => {
     const file = e.target.files[0];

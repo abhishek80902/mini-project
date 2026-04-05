@@ -11,12 +11,14 @@ export default function App() {
   const [dark, setDark] = useState(false);
 
   // ✅ LOAD theme from localStorage
-  useEffect(() => {
+ useEffect(() => {
+  if (typeof window !== "undefined") {
     const savedTheme = localStorage.getItem("theme");
     if (savedTheme === "dark") {
       setDark(true);
     }
-  }, []);
+  }
+}, []);
 
   // ✅ SAVE theme when changed
   const toggleTheme = () => {
