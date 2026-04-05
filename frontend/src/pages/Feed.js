@@ -1,5 +1,5 @@
 import { Container, CircularProgress } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import API from "../services/api";
 import InfiniteScroll from "react-infinite-scroll-component";
 import toast, { Toaster } from "react-hot-toast";
@@ -12,7 +12,8 @@ export default function Feed() {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
 
-  const fetchPosts = async (reset = false) => {
+  // ✅ FIX: useCallback added
+  const fetchPosts = useCallback(async (reset = false) => {
     try {
       const currentPage = reset ? 1 : page;
 
@@ -24,6 +25,7 @@ export default function Feed() {
         if (reset) {
           setPosts(res.data);
           setPage(1);
+          setHasMore(true); // 🔥 reset scroll properly
         } else {
           setPosts((prev) => [...prev, ...res.data]);
         }
@@ -31,11 +33,12 @@ export default function Feed() {
     } catch {
       toast.error("Failed to load posts");
     }
-  };
+  }, [page]);
 
+  // ✅ FIX: dependency corrected
   useEffect(() => {
     fetchPosts();
-  }, [page]);
+  }, [fetchPosts]);
 
   return (
     <>
@@ -48,7 +51,11 @@ export default function Feed() {
           dataLength={posts.length}
           next={() => setPage((p) => p + 1)}
           hasMore={hasMore}
-          loader={<CircularProgress sx={{ display: "block", mx: "auto", my: 2 }} />}
+          loader={
+            <CircularProgress
+              sx={{ display: "block", mx: "auto", my: 2 }}
+            />
+          }
         >
           {posts.map((post) => (
             <PostCard
